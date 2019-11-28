@@ -10,15 +10,15 @@ let $LANG = 'en_US.UTF-8'
 "}}}
 
 "键盘映射相关{{{ 
-"map <F12> :!python.exe % "F12 运行python
+map <F5> :!python3 % "F12 运行python
 "}}}
 
 "基本设置{{{ 
 set nocompatible " 关闭vi 兼通模式
-set mouse=a  "启用鼠标
+set mouse=a  "启用鼠
 autocmd BufWritePost $MYVIMRC source $MYVIMRC "让配置立即生效
 "set pythonthreedll=python36.dll "设置python共享库动态加载路径，windows是dll，unix是so文件
-set pythonthreedll=/centos/install/python3.5.4/lib/libpython3.so
+set pythonthreedll=/mac/install/python3.6.5/lib/libpython3.6m.dylib
 "}}}
 
 
@@ -74,67 +74,14 @@ filetype plugin on "为特定文件类型载入相关缩进文件
 filetype plugin indent on "允许插件
 "}}
 
+"ctags设置{{{
+"let Tlist_Ctags_Cmd='/usr/local/bin/ctags' "设备ctags命令路径
+set tags=tags "
+set tags+=./tags "表示在当前目录tags中搜索tags文件
+set tags+=/mac/install/python3.6.5/tags "表示还要搜索/usr/tags目录下的tags文件
 
-"python设置{{{ 
-autocmd FileType python set tabstop=4 shiftwidth=4 expandtab "Python文件的一般设置
-"autocmd FIleType python map <F5> :!python %<CR>
-"vmap <C-c> "+y "选中状态下 ctrl＋c 复制
-autocmd FileType python set omnifunc=python3complete#Complete
+"map <F5> :!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
+"imap <F5> <ESC>:!ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR><CR> :TlistUpdate<CR>
+"ctags -R --languages=python --python-kinds=cfmvi --fields=aimS
+map <F5> :!ctags -R --languages=python --python-kinds=cfmvi --fields=aimS .<CR><CR> :TlistUpdate<CR>
 "}}}
-
-"js设置{{{ 
-let b:javascript_flod=1 " js折叠
-let javascript_enable_domhtmlcss=1 "打开 js对dom、html、css的支持
-"}}}
-
-
-
-"""""""""""""""""""""""""""""
-"新文件标题设置"
-"""""""""""""""""""""""""""""
-autocmd BufNewFile *.c,*.py,*.sh,*.java exec ":call SetTitle()"
-"定义函数SetTitle，自动插入文件头
-func! SetTitle()
-    if &filetype == 'sh'
-        call setline(1, "\:<<!")
-        call append(line("."), "\ FileName: ".expand("%"))
-        call append(line(".")+1, "\ Author: fengdy ")
-        call append(line(".")+2, "\ Email:  llsuper@126.com")
-        call append(line(".")+3, "\ Date: ".strftime("%c"))
-        call append(line(".")+4, "\!")
-    endif
-    if &filetype == 'java'
-        call setline(1, "\/*")
-        call append(line("."), "\ FileName: ".expand("%"))
-        call append(line(".")+1, "\ Author: fengdy ")
-        call append(line(".")+2, "\ Email:  llsuper@126.com")
-        call append(line(".")+3, "\ Date: ".strftime("%c"))
-        call append(line(".")+4, "\*/")
-    endif
-    if &filetype == 'python'
-        call setline(1, "\#-*-coding:utf-8-*-")
-        call setline(2, "\'''")
-        call setline(3,"\ FileName: ".expand("%"))
-        call setline(4, "\ Author: fengdy ")
-        call setline(5, "\ Email:  llsuper@126.com")
-        call setline(6, "\ Date: ".strftime("%c"))
-        call setline(7, "\'''")
-    endif
-	"新建文件后，自动定位到文件末尾
-    autocmd BufNewFile * normal G
-endfunc
-"映射F5为编译运行
-map <F5> :call CompileAndRun()<CR>
-func! CompileAndRun()
-    setlocal buftype=
-    "et time_cmd="!"
-    silent !clear
-    let time_cmd='!date "+\%F \%T" && '
-	exec "w"
-	if &filetype == 'python'
-		exec time_cmd."python %"
-    elseif &filetype == 'sh'
-		exec time_cmd"bash %"
-	endif
-    setlocal buftype=
-endfunc
